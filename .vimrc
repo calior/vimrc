@@ -11,7 +11,7 @@ set fileencoding=utf-8
 set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
 set langmenu=zh_CN.UTF-8
 language messages zh_CN.UTF-8
-set clipboard=unnamedplus
+set clipboard=unnamed
 set foldlevel=99
 set ruler
 set showcmd
@@ -40,6 +40,9 @@ map <C-j> <C-W>j
 map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
+" 映射切换buffer的键位
+nnoremap [b :bp<CR>
+nnoremap ]b :bn<CR>
 
 
 "重定义<leader>
@@ -60,6 +63,18 @@ call vundle#begin()
 
 Plugin 'VundleVim/Vundle.vim'
 
+"+++++++ tagbar [tag列表] ++++++++++
+Plugin 'majutsushi/tagbar'
+
+"+++++++ autotag [自动tag] ++++++++++
+Plugin 'craigemery/vim-autotag'
+
+"+++++++ vim-go [插件] +++++++
+Plugin 'fatih/vim-go'
+
+"+++++++ Python Mode [插件] ++++++
+Plugin 'klen/python-mode'
+
 "+++++++ 主题颜色 [插件] +++++++
 Plugin 'altercation/vim-colors-solarized'
 
@@ -69,7 +84,9 @@ Plugin 'jistr/vim-nerdtree-tabs'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 
 "+++++++ 状态栏 [插件] +++++++
-Plugin 'bling/vim-airline'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+
 
 "+++++++ 括号匹配 [插件] +++++
 Plugin 'kien/rainbow_parentheses.vim'
@@ -118,8 +135,8 @@ filetype plugin indent on    " required
 syntax enable
 set t_Co=256
 colorscheme solarized
-hi Normal ctermbg=232
-hi LineNr ctermbg=233
+hi Normal ctermbg=0
+"hi LineNr ctermbg=233
 hi CursorLine ctermbg=8
 hi TabLine ctermbg=8
 hi Pmenu ctermbg=11 ctermfg=00
@@ -131,23 +148,14 @@ autocmd vimenter * NERDTree
 let g:nerdtree_tabs_open_on_console_startup=1
 let g:nerdtree_tabs_focus_on_files=1
 
-"++++++ 状态栏 [配置] +++++++++++++
-"在家目录下新建一个.fonts文件夹： $ mkdir ~/.fonts 然后 $ cd ~/.fonts 进入文件夹，执行 $git clone git@github.com:Lokaltog/powerline-fonts.git 下载已经打过补丁的字体文件。此时， ~/.fonts/ 目录下已经存在打过补丁的常用系统字体文件了。运行 $ fc-cache -vf ~/.fonts 安装patched fonts到系统中。设置终端字体为打过补丁的字体
-" airline设置
+"++++++ airline 状态栏 [配置] +++++++++++++
+" iterm2 需要在设置中指定安装的字体（https://github.com/powerline/fonts）
 set laststatus=2
-" 使用powerline打过补丁的字体
 let g:airline_powerline_fonts = 1
-" 开启tabline
+let g:airline_theme='luna'
 let g:airline#extensions#tabline#enabled = 1
-" tabline中当前buffer两端的分隔字符
-let g:airline#extensions#tabline#left_sep = ' '
-" tabline中未激活buffer两端的分隔字符
-let g:airline#extensions#tabline#left_alt_sep = '|'
-" tabline中buffer显示编号
-let g:airline#extensions#tabline#buffer_nr_show = 1
-" 映射切换buffer的键位
-nnoremap [b :bp<CR>
-nnoremap ]b :bn<CR>
+let g:airline#extensions#tabline#left_sep = '$'
+let g:airline#extensions#tabline#left_alt_sep = '￥'
 
 
 
@@ -166,7 +174,6 @@ let g:rbpt_colorpairs = [
     \ ['darkmagenta', 'DarkOrchid3'],
     \ ['brown',       'firebrick3'],
     \ ['gray',        'RoyalBlue3'],
-    \ ['black',       'SeaGreen3'],
     \ ['darkmagenta', 'DarkOrchid3'],
     \ ['darkred',     'DarkOrchid3'],
     \ ['Darkblue',    'firebrick3'],
@@ -200,6 +207,47 @@ let g:NERDTreeIndicatorMapCustom = {
     \ "Unknown"   : "?"
     \ }
 
-"++++++ auto save comfig +++++
+"++++++ auto save config +++++
 let g:auto_save = 1 " 开启自动保存
 let g:auto_save_in_insert_mode = 0 "插入模式下不保存
+
+
+"++++++ python-mode config +++++
+let g:pymode_rope = 0
+let g:pymode_rope_lookup_project = 0
+let g:pymode_rope_complete_on_dot = 0
+
+"+++++ tagbar config +++++++++++
+nmap <Leader>t :TagbarToggle<CR>      "快捷键设置
+let g:tagbar_ctags_bin='ctags'         "ctags程序的路径
+let g:tagbar_width=30                  "窗口宽度的设置
+"map <F3> :Tagbar<CR>
+"如果是py,go,c语言的程序的话，tagbar自动开启"
+autocmd BufReadPost *.py,*.go,*.cpp,*.c,*.h,*.hpp,*.cc,*.cxx call tagbar#autoopen()
+let g:tagbar_type_go = {
+    \ 'ctagstype' : 'go',
+    \ 'kinds'     : [
+        \ 'p:package',
+        \ 'i:imports:1',
+        \ 'c:constants',
+        \ 'v:variables',
+        \ 't:types',
+        \ 'n:interfaces',
+        \ 'w:fields',
+        \ 'e:embedded',
+        \ 'm:methods',
+        \ 'r:constructor',
+        \ 'f:functions'
+    \ ],
+    \ 'sro' : '.',
+    \ 'kind2scope' : {
+        \ 't' : 'ctype',
+        \ 'n' : 'ntype'
+    \ },
+    \ 'scope2kind' : {
+        \ 'ctype' : 't',
+        \ 'ntype' : 'n'
+    \ },
+    \ 'ctagsbin'  : 'gotags',
+    \ 'ctagsargs' : '-sort -silent'
+    \ }

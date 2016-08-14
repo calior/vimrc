@@ -28,6 +28,7 @@ set sta
 set expandtab
 autocmd FileType python setlocal foldmethod=indent
 autocmd FileType python setlocal et sta sw=4 sts=4
+autocmd FileType go setlocal ts=4
 autocmd FileType mkd setlocal et sta sw=4 sts=4
 autocmd FileType yaml setlocal sw=2 sts=2
 
@@ -251,3 +252,6 @@ let g:tagbar_type_go = {
     \ 'ctagsbin'  : 'gotags',
     \ 'ctagsargs' : '-sort -silent'
     \ }
+
+"+++++ vim-go config+++++++++
+let g:go_fmt_autosave = 0

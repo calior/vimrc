@@ -5,6 +5,8 @@
 "3. open vim, ignore warnings, in cmd mode, ``:PluginInstall``
 "4. cd ~/.vim/bundle/YouCompleteMe/
 "5. run ``./install.py``
+"其它
+"安装 the_silver_searcher, gotags,
 
 syntax on
 set fileencoding=utf-8
@@ -16,7 +18,7 @@ set foldlevel=99
 set ruler
 set showcmd
 set number
-set mouse-=a
+set mouse=a
 set hlsearch
 "自动切换目录
 set acd
@@ -41,10 +43,13 @@ map <C-j> <C-W>j
 map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
+
 " 映射切换buffer的键位
 nnoremap [b :bp<CR>
 nnoremap ]b :bn<CR>
 
+" 自动语义补全 
+inoremap <C-Space> <C-x><C-o>
 
 "重定义<leader>
 let mapleader = ','
@@ -56,6 +61,11 @@ noremap L $
 map <leader>y "+y
 map <leader>p "+p
 
+"OCaml 相关
+"set rtp^="/Users/didi/.opam/system/share/ocp-indent/vim"
+let g:opamshare = substitute(system('opam config var share'),'\n$','','''')
+execute "set rtp+=" . g:opamshare . "/merlin/vim"
+
 "----------------vundle 插件管理---------------
 set nocompatible              " be iMproved, required
 filetype off                  " required
@@ -63,6 +73,23 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 Plugin 'VundleVim/Vundle.vim'
+
+"+++++++ ocp related +++
+Plugin 'def-lkb/ocp-indent-vim'
+Plugin 'rgrinberg/vim-ocaml'
+
+
+"+++++++ 很神奇的插件 ++++++
+Plugin 'tpope/vim-sensible'
+
+"+++++++ syntastic 语法分析 +++++++
+Plugin 'scrooloose/syntastic'
+
+"+++++++ fswitch 头文件切换 +++++++
+Plugin 'derekwyatt/vim-fswitch'
+
+"+++++++ ack 全局搜索 +++++++
+Plugin 'mileszs/ack.vim'
 
 "+++++++ tagbar [tag列表] ++++++++++
 Plugin 'majutsushi/tagbar'
@@ -114,17 +141,19 @@ Plugin 'hdima/python-syntax'
 Plugin 'terryma/vim-expand-region'
 
 "+++++++ clojure 相关插件 +++
+Plugin 'venantius/vim-eastwood'
 Plugin 'guns/vim-clojure-static'
 Plugin 'guns/vim-clojure-highlight'
 Plugin 'guns/vim-sexp'
 Plugin 'tpope/vim-fireplace'
 Plugin 'clojure-emacs/cider-nrepl'
+Plugin 'venantius/vim-cljfmt'
 
 "+++++++ repeat +++
 Plugin 'tpope/vim-repeat'
 
-"+++++++ auto-save +++
-Plugin '907th/vim-auto-save'
+"+++++++ Dash 帮助文档 +++
+Plugin 'rizzatti/dash.vim'
 
 
 call vundle#end()            " required
@@ -208,18 +237,13 @@ let g:NERDTreeIndicatorMapCustom = {
     \ "Unknown"   : "?"
     \ }
 
-"++++++ auto save config +++++
-let g:auto_save = 1 " 开启自动保存
-let g:auto_save_in_insert_mode = 0 "插入模式下不保存
-
-
 "++++++ python-mode config +++++
 let g:pymode_rope = 0
 let g:pymode_rope_lookup_project = 0
 let g:pymode_rope_complete_on_dot = 0
 
 "+++++ tagbar config +++++++++++
-nmap <Leader>t :TagbarToggle<CR>      "快捷键设置
+nmap <Leader>p :TagbarToggle<CR>      "快捷键设置
 let g:tagbar_ctags_bin='ctags'         "ctags程序的路径
 let g:tagbar_width=30                  "窗口宽度的设置
 "map <F3> :Tagbar<CR>
@@ -254,4 +278,39 @@ let g:tagbar_type_go = {
     \ }
 
 "+++++ vim-go config+++++++++
-let g:go_fmt_autosave = 0
+"let g:go_fmt_autosave = 0
+
+"+++++ vim-cljfmt config ++++
+"let g:clj_fmt_autosave = 0
+"
+"++++++ vim ack config ++++++
+let g:ackprg = 'ag --nogroup --nocolor --column'
+
+"+++++++ 语法检查配置[syntastic] +++++++
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+
+let g:syntastic_ocaml_checkers = ['merlin']
+
+
+"+++++++ Dash 文档的快捷键
+nmap <silent> <leader>k <Plug>DashSearch
+
+"+++++++ ymc 
+let g:ycm_semantic_triggers =  {
+  \   'c' : ['->', '.'],
+  \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
+  \             're!\[.*\]\s'],
+  \   'ocaml' : ['.', '#'],
+  \   'cpp,objcpp' : ['->', '.', '::'],
+  \   'perl' : ['->'],
+  \   'php' : ['->', '::'],
+  \   'cs,java,javascript,typescript,d,python,perl6,scala,vb,elixir,go' : ['.'],
+  \   'ruby' : ['.', '::'],
+  \   'lua' : ['.', ':'],
+  \   'erlang' : [':'],
+  \ }
